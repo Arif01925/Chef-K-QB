@@ -1,0 +1,4 @@
+---
+deployment:
+  tasks:
+    - echo "✅ Deployment file recognized"
