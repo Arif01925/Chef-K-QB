@@ -1,0 +1,64 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+    <h1 class="mb-4">Payroll Summary</h1>
+
+    <form method="GET" action="{{ route('payroll.summary') }}" class="row g-2 align-items-end mb-4">
+        <div class="col-md-3">
+            <label for="week_start" class="form-label">Start Date</label>
+            <input type="date" name="week_start" id="week_start" class="form-control" value="{{ $weekStart->toDateString() }}">
+        </div>
+        <div class="col-md-3">
+            <label for="week_end" class="form-label">End Date</label>
+            <input type="date" name="week_end" id="week_end" class="form-control" value="{{ $weekEnd->toDateString() }}">
+        </div>
+        <div class="col-md-3">
+            <label for="employee_id" class="form-label">Employee</label>
+            <select name="employee_id" id="employee_id" class="form-control">
+                <option value="">-- All Employees --</option>
+                @foreach($employees as $emp)
+                    <option value="{{ $emp->id }}" {{ isset($employeeId) && $employeeId == $emp->id ? 'selected' : '' }}>
+                        {{ $emp->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-md-auto">
+            <button type="submit" class="btn btn-primary">View Summary</button>
+        </div>
+    </form>
+
+    <h5>Period: {{ $weekStart->toDateString() }} to {{ $weekEnd->toDateString() }}</h5>
+
+    <table class="table table-bordered mt-3">
+        <thead>
+            <tr>
+                <th>Employee</th>
+                <th>Date</th>
+                <th>In Time</th>
+                <th>Out Time</th>
+                <th>Total Hours</th>
+                <th>Daily Pay</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($records as $record)
+                <tr>
+                    <td>{{ $record->employee->name }}</td>
+                    <td>{{ $record->work_date }}</td>
+                    <td>{{ \Carbon\Carbon::parse($record->in_time)->format('h:i A') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($record->out_time)->format('h:i A') }}</td>
+                    <td>{{ $record->total_hours }}</td>
+                    <td>${{ number_format($record->total_hours * $record->hourly_rate, 2) }}</td>
+                </tr>
+            @endforeach
+            <tr>
+                <td colspan="5" class="text-end fw-bold">Total:</td>
+                <td><strong>${{ number_format($records->sum(fn($r) => $r->total_hours * $r->hourly_rate), 2) }}</strong></td>
+            </tr>
+        </tbody>
+    </table>
+
+</div>
+@endsection
