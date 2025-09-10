@@ -3,7 +3,7 @@
 <head>
     <head>
     <title>Chef K QuickBooks</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <link rel="icon" type="image/x-icon" href="{{ asset('public/favicon.ico') }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -42,7 +42,7 @@
         <!-- Sidebar -->
         <div class="sidebar p-3">
             <div class="text-center mb-3">
-                <img src="{{ asset('logo.png') }}" alt="Chef K Logo" style="height:60px; width:auto; margin-bottom:10px;">
+                <img src="{{ asset('public/logo.png') }}" alt="Chef K Logo" style="height:60px; width:auto; margin-bottom:10px;">
             </div>
             <a href="{{ route('logout') }}"
             class="{{ request()->is('logout') ? 'active' : '' }}">
