@@ -1,31 +1,36 @@
+
 name: Publish Website to CPanel
 on:
   push:
     branches:
-      - develop
+      - main
 jobs:
   FTP-Deploy-Action:
     name: FTP-Deploy-Action
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2.1.0
-      with:
-        fetch-depth: 2 
-    # - name: Build assets
-    #   run: npm install && npm run build
+      - uses: actions/checkout@v2.1.0
+        with:
+          fetch-depth: 2
 
-    - name: Install PHP and Composer
-      uses: shivammathur/setup-php@v2
-      with:
-          php-version: '8.1' # Adjust to match the PHP version used by your Laravel project
+      # Uncomment if you use npm for frontend assets
+      # - name: Build assets
+      #   run: npm install && npm run build
+
+      - name: Install PHP and Composer
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.1'
           tools: 'composer'
 
-    - name: Install PHP dependencies
-      run: composer update --no-dev --optimize-autoloader
-        
-    - name: FTP-Deploy-Action
-      uses: SamKirkland/FTP-Deploy-Action@4.3.3
-      with:
-        server: 132.148.178.111
-        username: chefkproduct@chefkproduct.com
-        password: ${{ secrets.ftp_api_password }}
+      - name: Install PHP dependencies
+        run: composer install --no-dev --optimize-autoloader
+
+      - name: FTP-Deploy-Action
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        with:
+          server: 132.148.178.111
+          username: chefkproduct@chefkproduct.com
+          password: ${{ secrets.ftp_api_password }}
+          # Uncomment and set your deployment directory if needed
+          # server-dir: /public_html/accounting.chefkproduct.com
