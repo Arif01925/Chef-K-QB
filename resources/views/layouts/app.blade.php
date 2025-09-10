@@ -41,6 +41,9 @@
     <div class="d-flex">
         <!-- Sidebar -->
         <div class="sidebar p-3">
+            <div class="text-center mb-3">
+                <img src="{{ asset('logo.png') }}" alt="Chef K Logo" style="height:60px; width:auto; margin-bottom:10px;">
+            </div>
             <a href="{{ route('logout') }}"
             class="{{ request()->is('logout') ? 'active' : '' }}">
                 <i class="bi bi-power"></i> Log Out
