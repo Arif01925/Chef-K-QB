@@ -38,18 +38,32 @@
 </head>
 <body class="bg-gray-100 font-sans">
 
+    <!-- Header with Profile Dropdown -->
+    <div class="d-flex justify-content-between align-items-center px-4" style="height:60px; background:#fff; border-bottom:1px solid #dee2e6;">
+        <div>
+            <a href="/dashboard" class="fw-bold fs-3 text-decoration-none" style="font-family: 'Monotype Corsiva'; color: #333;">Chef K, Inc.</a>
+        </div>
+        <div class="dropdown">
+            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name ?? 'User') }}" alt="Profile Photo" width="40" height="40" class="rounded-circle me-2">
+                <div class="d-flex flex-column align-items-start">
+                    <span class="fw-bold" style="font-size: 1.1rem;">{{ Auth::user()->name ?? 'User' }}</span>
+                    <span class="text-muted" style="font-size: 0.95rem; margin-top:-2px;">{{ Auth::user()->role ?? '' }}</span>
+                </div>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                <li><a class="dropdown-item" href="{{ route('profile.show') }}">Profile</a></li>
+                <li><a class="dropdown-item" href="#">Inbox</a></li>
+                <li><a class="dropdown-item" href="#">Settings</a></li>
+                <li><a class="dropdown-item" href="#">Support</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="{{ route('logout') }}">Log Out</a></li>
+            </ul>
+        </div>
+    </div>
     <div class="d-flex">
         <!-- Sidebar -->
-        <div class="sidebar p-3">
-            <div class="text-center mb-3">
-                <img src="{{ asset('public/logo.png') }}" alt="Chef K Logo" style="height:60px; width:auto; margin-bottom:10px;">
-            </div>
-            <a href="{{ route('logout') }}"
-            class="{{ request()->is('logout') ? 'active' : '' }}">
-                <i class="bi bi-power"></i> Log Out
-            </a>
-            </br>
-            <h2 class="mb-4" style="font-family: 'Monotype Corsiva';">Chef K, Inc.</h2>
+    <div class="sidebar p-3">
             <a href="/dashboard" class="{{ request()->is('dashboard') ? 'active' : '' }}">
                 <i class="bi bi-speedometer2"></i> Dashboard
             </a>
