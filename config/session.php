@@ -18,7 +18,11 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'database'),
+    // Default to 'file' to avoid blocking DB session writes when the
+    // SESSION_DRIVER isn't explicitly set in the environment. If you
+    // want DB-backed sessions, set SESSION_DRIVER=database in your .env
+    // and ensure the sessions table exists (`php artisan session:table`).
+    'driver' => env('SESSION_DRIVER', 'file'),
 
     /*
     |--------------------------------------------------------------------------

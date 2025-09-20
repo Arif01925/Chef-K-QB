@@ -64,3 +64,26 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+## Local development quick setup (sqlite fallback)
+
+If you don't want to run MySQL locally, you can use the included SQLite fallback. Steps:
+
+- Ensure `database/database.sqlite` exists (the repo contains an empty file at that path).
+- Create or update your `.env` to use sqlite (example):
+
+	DB_CONNECTION=sqlite
+	DB_DATABASE=database/database.sqlite
+
+- Use file session driver to avoid DB session writes unless you intentionally use DB sessions:
+
+	SESSION_DRIVER=file
+
+- Run the usual artisan steps:
+
+```powershell
+php artisan key:generate
+php artisan migrate
+```
+
+If you prefer DB-backed sessions, set `SESSION_DRIVER=database` and then run `php artisan session:table` and `php artisan migrate` to create the `sessions` table.

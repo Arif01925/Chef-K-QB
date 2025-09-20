@@ -89,3 +89,22 @@ Route::post('/payroll/toggle-status', [PayrollController::class, 'toggleStatus']
 
 Route::get('/payroll/print', [PayrollController::class, 'print'])->name('payroll.print');
 
+// Debug route: returns simple DB latency (milliseconds) and a success flag
+Route::get('/_debug/db-latency', function () {
+    try {
+        $start = microtime(true);
+        // run a tiny query
+        \DB::select('select 1');
+        $end = microtime(true);
+        return response()->json([
+            'ok' => true,
+            'latency_ms' => round(($end - $start) * 1000, 2),
+        ]);
+    } catch (\Throwable $e) {
+        return response()->json([
+            'ok' => false,
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+});
+

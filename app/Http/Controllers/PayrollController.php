@@ -5,13 +5,16 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Employee;
 use App\Models\EmployeeAttendance;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class PayrollController extends Controller
 {
     public function index()
     {
-        $employees = Employee::all();
+        // Select only the columns needed for the employee dropdown to
+        // avoid loading large objects (photos, timestamps) into memory.
+        $employees = Employee::select('id', 'name', 'role', 'department', 'hourly_rate')->get();
         $attendances = EmployeeAttendance::with('employee')->latest()->paginate(6);
 
 
@@ -20,6 +23,8 @@ class PayrollController extends Controller
 
     public function store(Request $request)
     {
+        Log::debug('payroll.store:start', ['time' => microtime(true)]);
+
         $request->validate([
             'employee_id' => 'required|exists:employees,id',
             'work_date' => 'required|date',
@@ -27,7 +32,11 @@ class PayrollController extends Controller
             'out_time' => 'nullable|date_format:H:i',
         ]);
 
+        Log::debug('payroll.store:after_validation', ['time' => microtime(true)]);
+
         $employee = Employee::findOrFail($request->employee_id);
+
+    Log::debug('payroll.store:after_employee_lookup', ['employee_id' => $request->employee_id, 'time' => microtime(true)]);
 
         $totalHours = 0;
         if ($request->in_time && $request->out_time) {
@@ -51,7 +60,13 @@ class PayrollController extends Controller
             'status' => 'Unpaid',
         ]);
 
-        return redirect()->back()->with('success', 'Attendance saved successfully.');
+    Log::debug('payroll.store:after_create', ['time' => microtime(true)]);
+
+    // mark just before returning so we can detect whether session/middleware
+    // is delaying the response after DB create
+    Log::debug('payroll.store:before_redirect', ['time' => microtime(true)]);
+
+    return redirect()->back()->with('success', 'Attendance saved successfully.');
     }
 
     public function edit($id)
