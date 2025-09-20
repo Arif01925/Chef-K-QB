@@ -18,7 +18,7 @@
         <div class="mb-3">
             <label for="photo" class="form-label">Profile Photo</label><br>
             @if($user->photo)
-                <img src="{{ asset('storage/' . $user->photo) }}" alt="Profile Photo" width="80" class="rounded mb-2">
+                <img src="{{ Storage::url($user->photo) }}" alt="Profile Photo" width="80" class="rounded mb-2">
             @endif
             <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
         </div>

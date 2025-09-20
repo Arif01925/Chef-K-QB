@@ -45,7 +45,7 @@
         </div>
         <div class="dropdown">
             <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="{{ Auth::user()->photo ? asset('storage/' . Auth::user()->photo) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name ?? 'User') }}" alt="Profile Photo" width="40" height="40" class="rounded-circle me-2">
+                <img src="{{ Auth::user()->photo ? Storage::url(Auth::user()->photo) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name ?? 'User') }}" alt="Profile Photo" width="40" height="40" class="rounded-circle me-2">
                 <div class="d-flex flex-column align-items-start">
                     <span class="fw-bold" style="font-size: 1.1rem;">{{ Auth::user()->name ?? 'User' }}</span>
                     <span class="text-muted" style="font-size: 0.95rem; margin-top:-2px;">{{ Auth::user()->role ?? '' }}</span>
