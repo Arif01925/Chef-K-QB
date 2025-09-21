@@ -21,22 +21,13 @@
                 $displayUser = $user ?? Auth::user();
             @endphp
             @if(optional($displayUser)->photo)
-                @php
-                    try {
-                        $tmp = Storage::disk('public')->url($displayUser->photo);
-                        $storagePath = parse_url($tmp, PHP_URL_PATH) ?: '/'.trim('storage/' . $displayUser->photo, '/');
-                        $localFile = public_path(ltrim($storagePath, '/'));
-                        if (file_exists($localFile)) {
-                            $photoUrl = $storagePath;
-                        } else {
-                            $photoUrl = '/_s/' . ltrim($displayUser->photo, '/');
-                        }
-                    } catch (\Throwable $e) {
-                        $photoUrl = '/'.trim('storage/' . $displayUser->photo, '/');
-                    }
-                @endphp
-                <img src="{{ $photoUrl }}" alt="Profile Photo" width="80" class="rounded mb-2">
+            <img src="{{ asset('storage/' . $displayUser->photo) }}" 
+             alt="Profile Photo" width="80" class="rounded mb-2">
+            @else
+            <img src="{{ asset('default.png') }}" 
+            alt="Default Profile" width="80" class="rounded mb-2">
             @endif
+
             <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
         </div>
         <button type="submit" class="btn btn-primary">Update Profile</button>
