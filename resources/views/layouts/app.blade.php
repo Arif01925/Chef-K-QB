@@ -44,11 +44,35 @@
             <a href="/dashboard" class="fw-bold fs-3 text-decoration-none" style="font-family: 'Monotype Corsiva'; color: #333;">Chef K, Inc.</a>
         </div>
         <div class="dropdown">
+            @php
+                $currentUser = Auth::user();
+                $displayName = optional($currentUser)->name ?? 'User';
+                if ($currentUser && optional($currentUser)->photo) {
+                    try {
+                        $tmp = Storage::disk('public')->url($currentUser->photo);
+                        // prefer a relative path so the current host serves the file
+                        $path = parse_url($tmp, PHP_URL_PATH) ?: $tmp;
+                        // if the file exists in storage, prefer /storage/... path; if not accessible, fallback to /_s/ route
+                        $storagePath = $path;
+                        $localFile = public_path(ltrim($storagePath, '/'));
+                        if (file_exists($localFile)) {
+                            $displayPhoto = $storagePath;
+                        } else {
+                            // fallback to serving from storage directly
+                            $displayPhoto = '/_s/' . ltrim($currentUser->photo, '/');
+                        }
+                    } catch (\Throwable $e) {
+                        $displayPhoto = 'https://ui-avatars.com/api/?name=' . urlencode($displayName);
+                    }
+                } else {
+                    $displayPhoto = 'https://ui-avatars.com/api/?name=' . urlencode($displayName);
+                }
+            @endphp
             <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="{{ Auth::user()->photo ? Storage::disk('public')->url(Auth::user()->photo) : 'https://ui-avatars.com/api/?name=' . urlencode(Auth::user()->name ?? 'User') }}" alt="Profile Photo" width="40" height="40" class="rounded-circle me-2">
+                <img src="{{ $displayPhoto }}" alt="Profile Photo" width="40" height="40" class="rounded-circle me-2">
                 <div class="d-flex flex-column align-items-start">
-                    <span class="fw-bold" style="font-size: 1.1rem;">{{ Auth::user()->name ?? 'User' }}</span>
-                    <span class="text-muted" style="font-size: 0.95rem; margin-top:-2px;">{{ Auth::user()->role ?? '' }}</span>
+                    <span class="fw-bold" style="font-size: 1.1rem;">{{ $displayName }}</span>
+                    <span class="text-muted" style="font-size: 0.95rem; margin-top:-2px;">{{ optional($currentUser)->role ?? '' }}</span>
                 </div>
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">

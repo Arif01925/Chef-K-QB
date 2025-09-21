@@ -9,16 +9,33 @@
         @csrf
         <div class="mb-3">
             <label for="name" class="form-label">Name</label>
-            <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $user->name) }}" required>
+            <input type="text" class="form-control" id="name" name="name" value="{{ old('name', optional($user)->name) }}" required>
         </div>
         <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $user->email) }}" required>
+            <input type="email" class="form-control" id="email" name="email" value="{{ old('email', optional($user)->email) }}" required>
         </div>
         <div class="mb-3">
             <label for="photo" class="form-label">Profile Photo</label><br>
-            @if($user->photo)
-                <img src="{{ Storage::disk('public')->url($user->photo) }}" alt="Profile Photo" width="80" class="rounded mb-2">
+            @php
+                $displayUser = $user ?? Auth::user();
+            @endphp
+            @if(optional($displayUser)->photo)
+                @php
+                    try {
+                        $tmp = Storage::disk('public')->url($displayUser->photo);
+                        $storagePath = parse_url($tmp, PHP_URL_PATH) ?: '/'.trim('storage/' . $displayUser->photo, '/');
+                        $localFile = public_path(ltrim($storagePath, '/'));
+                        if (file_exists($localFile)) {
+                            $photoUrl = $storagePath;
+                        } else {
+                            $photoUrl = '/_s/' . ltrim($displayUser->photo, '/');
+                        }
+                    } catch (\Throwable $e) {
+                        $photoUrl = '/'.trim('storage/' . $displayUser->photo, '/');
+                    }
+                @endphp
+                <img src="{{ $photoUrl }}" alt="Profile Photo" width="80" class="rounded mb-2">
             @endif
             <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
         </div>

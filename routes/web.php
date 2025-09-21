@@ -1,8 +1,25 @@
 
 <?php
-// Profile page
-Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show');
-Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
+
+// Fallback route to serve files from storage/app/public in case the
+// public/storage symlink is missing or can't be used on the host.
+Route::get('/_s/{path}', function ($path) {
+    $file = storage_path('app/public/' . $path);
+    if (!file_exists($file)) {
+        abort(404);
+    }
+    $mime = mime_content_type($file) ?: 'application/octet-stream';
+    return Response::make(file_get_contents($file), 200, [
+        'Content-Type' => $mime,
+        'Cache-Control' => 'public, max-age=31536000',
+    ]);
+})->where('path', '.*');
+
+// Profile page (require authentication)
+Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'show'])->name('profile.show')->middleware('auth');
+Route::post('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update')->middleware('auth');
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DashboardController;
@@ -107,4 +124,37 @@ Route::get('/_debug/db-latency', function () {
         ], 500);
     }
 });
+
+// Profile image debug (authenticated) - returns info about user's photo paths
+Route::get('/_profile_debug', function () {
+    if (!\Illuminate\Support\Facades\Auth::check()) {
+        return response()->json(['auth' => false, 'message' => 'not authenticated'], 200);
+    }
+    $user = \Illuminate\Support\Facades\Auth::user();
+    $photo = $user->photo;
+    $storageUrl = null;
+    try {
+        $storageUrl = \Illuminate\Support\Facades\Storage::disk('public')->url($photo);
+    } catch (\Throwable $e) {
+        $storageUrl = null;
+    }
+    $storageAppFile = storage_path('app/public/' . ($photo ?? ''));
+    $publicFile = public_path('storage/' . ($photo ?? ''));
+    return response()->json([
+        'auth' => true,
+        'user_id' => $user->id,
+        'user_name' => $user->name,
+        'photo_db' => $photo,
+        'storage_url' => $storageUrl,
+        'storage_app_file_exists' => file_exists($storageAppFile),
+        'storage_app_file' => $storageAppFile,
+        'public_storage_file_exists' => file_exists($publicFile),
+        'public_storage_file' => $publicFile,
+        'suggested_urls' => [
+            'storage_path' => $storageUrl ? parse_url($storageUrl, PHP_URL_PATH) : null,
+            'public_storage' => '/storage/' . ($photo ?? ''),
+            'fallback' => '/_s/' . ($photo ?? ''),
+        ],
+    ]);
+})->middleware('auth');
 
