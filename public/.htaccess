@@ -3,6 +3,12 @@
         Options -MultiViews -Indexes
     </IfModule>
 
+
+     # Allow direct access to storage-link.php
+    <Files "storage-link.php">
+        Require all granted
+    </Files>
+
     RewriteEngine On
 
     # Handle Authorization Header
