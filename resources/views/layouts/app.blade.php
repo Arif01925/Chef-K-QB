@@ -69,7 +69,8 @@
                 }
             @endphp
             <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="{{ $displayPhoto }}" alt="Profile Photo" width="40" height="40" class="rounded-circle me-2">
+                <img src="{{ asset('storage/' . $currentUser->photo) }}" 
+                alt="Profile Photo" width="40" height="40" class="rounded-circle me-2">
                 <div class="d-flex flex-column align-items-start">
                     <span class="fw-bold" style="font-size: 1.1rem;">{{ $displayName }}</span>
                     <span class="text-muted" style="font-size: 0.95rem; margin-top:-2px;">{{ optional($currentUser)->role ?? '' }}</span>
