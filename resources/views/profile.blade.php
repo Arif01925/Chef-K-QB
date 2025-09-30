@@ -21,7 +21,7 @@
                 $displayUser = $user ?? Auth::user();
             @endphp
             @if(optional($displayUser)->photo)
-            <img src="{{ asset('storage/' . $displayUser->photo) }}" 
+                <img src="{{ asset($displayUser->photo) }}" 
              alt="Profile Photo" width="80" class="rounded mb-2">
             @else
             <img src="{{ asset('default.png') }}" 

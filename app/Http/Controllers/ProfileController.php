@@ -25,7 +25,13 @@ class ProfileController extends Controller
         $user->email = $request->email;
         if ($request->hasFile('photo')) {
             $filename = preg_replace('/[^A-Za-z0-9_.-]/', '_', $request->name) . '.' . $request->file('photo')->getClientOriginalExtension();
-            $path = $request->file('photo')->storeAs('profile_photos', $filename, 'public');
+            // Ensure public/profile_photos exists
+            $publicDir = public_path('profile_photos');
+            if (!file_exists($publicDir)) {
+                mkdir($publicDir, 0755, true);
+            }
+            // Move uploaded file to public/profile_photos so it is served directly from public
+            $request->file('photo')->move($publicDir, $filename);
             $user->photo = 'profile_photos/' . $filename;
         }
         $user->save();

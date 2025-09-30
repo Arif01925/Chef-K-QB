@@ -69,7 +69,15 @@
                 }
             @endphp
             <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="{{ asset('storage/' . $currentUser->photo) }}" 
+                @php
+                    // prefer public/profile_photos if file exists there
+                    if (!empty($currentUser) && optional($currentUser)->photo && file_exists(public_path($currentUser->photo))) {
+                        $thumb = asset($currentUser->photo);
+                    } else {
+                        $thumb = $displayPhoto;
+                    }
+                @endphp
+                <img src="{{ $thumb }}" 
                 alt="Profile Photo" width="40" height="40" class="rounded-circle me-2">
                 <div class="d-flex flex-column align-items-start">
                     <span class="fw-bold" style="font-size: 1.1rem;">{{ $displayName }}</span>
