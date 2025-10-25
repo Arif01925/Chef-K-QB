@@ -17,17 +17,9 @@
         </div>
         <div class="mb-3">
             <label for="photo" class="form-label">Profile Photo</label><br>
-            @php
-                $displayUser = $user ?? Auth::user();
-            @endphp
-            @if(optional($displayUser)->photo)
-                <img src="{{ asset('public/'.$displayUser->photo) }}"
-             alt="Profile Photo" width="80" class="rounded mb-2">
-            @else
-                <img src="{{ asset('public/default.png') }}"
-                     alt="Default Profile" width="80" class="rounded mb-2">
-            @endif
-
+            @php $path = optional($user)->photo; @endphp
+            <img src="{{ $path ? asset(ltrim($path, '/')) : asset('images/default-avatar.png') }}"
+                 alt="Profile Photo" width="80" class="rounded mb-2" style="object-fit:cover;">
             <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
         </div>
         <button type="submit" class="btn btn-primary">Update Profile</button>

@@ -45,40 +45,14 @@
         </div>
         <div class="dropdown">
             @php
-                $currentUser = Auth::user();
-                $displayName = optional($currentUser)->name ?? 'User';
-                if ($currentUser && optional($currentUser)->photo) {
-                    try {
-                        $tmp = Storage::disk('public')->url($currentUser->photo);
-                        // prefer a relative path so the current host serves the file
-                        $path = parse_url($tmp, PHP_URL_PATH) ?: $tmp;
-                        // if the file exists in storage, prefer /storage/... path; if not accessible, fallback to /_s/ route
-                        $storagePath = $path;
-                        $localFile = public_path(ltrim($storagePath, '/'));
-                        if (file_exists($localFile)) {
-                            $displayPhoto = $storagePath;
-                        } else {
-                            // fallback to serving from storage directly
-                            $displayPhoto = '/_s/' . ltrim($currentUser->photo, '/');
-                        }
-                    } catch (\Throwable $e) {
-                        $displayPhoto = 'https://ui-avatars.com/api/?name=' . urlencode($displayName);
-                    }
-                } else {
-                    $displayPhoto = 'https://ui-avatars.com/api/?name=' . urlencode($displayName);
-                }
+                $currentUser  = Auth::user();
+                $displayName  = trim($currentUser->name ?? 'User');
+                $photoPath    = $currentUser && $currentUser->photo ? ltrim($currentUser->photo, '/') : null;
+                $thumb        = $photoPath ? asset($photoPath)
+                                           : 'https://ui-avatars.com/api/?name=' . urlencode($displayName);
             @endphp
             <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                @php
-                    // prefer public/profile_photos if file exists there
-                    if (!empty($currentUser) && optional($currentUser)->photo && file_exists(public_path($currentUser->photo))) {
-                        $thumb = asset($currentUser->photo);
-                    } else {
-                        $thumb = $displayPhoto;
-                    }
-                @endphp
-                <img src="{{ $thumb }}"
-                alt="Profile Photo" width="40" height="40" class="rounded-circle me-2">
+                <img src="{{ $thumb }}" alt="Profile Photo" width="40" height="40" class="rounded-circle me-2">
                 <div class="d-flex flex-column align-items-start">
                     <span class="fw-bold" style="font-size: 1.1rem;">{{ $displayName }}</span>
                     <span class="text-muted" style="font-size: 0.95rem; margin-top:-2px;">{{ optional($currentUser)->role ?? '' }}</span>
