@@ -35,10 +35,8 @@ class ProfileController extends Controller
             $safeBase = preg_replace('/[^A-Za-z0-9\-_]/', '_', ($request->name ?: 'user'));
             $filename = $safeBase . '_' . time() . '.' . $ext;
 
-            // Decide target dir: local → public/, live (non-local) → project root
-            $targetDir = app()->environment('local')
-                ? public_path('profile_photos')
-                : base_path('profile_photos');
+            // Upload destination: always public/profile_photos
+            $targetDir = public_path('profile_photos');
 
             if (!file_exists($targetDir)) {
                 mkdir($targetDir, 0755, true);
@@ -47,7 +45,7 @@ class ProfileController extends Controller
             // Move the file
             $request->file('photo')->move($targetDir, $filename);
 
-            // Save path relative to the web root (works in both setups)
+            // Store the relative path as profile_photos/<filename> in the database
             $user->photo = 'profile_photos/' . $filename;
         }
 
