@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use App\Models\User;
 
 class ProfileController extends Controller
@@ -31,22 +32,26 @@ class ProfileController extends Controller
 
             // Handle photo upload if a photo is provided
             if ($request->hasFile('photo')) {
-                // Build a safe filename: name + timestamp + original extension
-                $ext = $request->file('photo')->getClientOriginalExtension();
-                $safeBase = preg_replace('/[^A-Za-z0-9\-_]/', '_', ($request->name ?: 'user'));
-                $filename = $safeBase . '_' . time() . '.' . $ext;
+                // Before saving a new photo, check if the user already has a previous photo and delete it
+                if ($user->photo && file_exists(public_path($user->photo))) {
+                    unlink(public_path($user->photo));
+                }
 
-                // Upload destination: always public/profile_photos
+                // Generate filename based only on the user's name
+                $ext = $request->file('photo')->getClientOriginalExtension();
+                $filename = Str::slug($user->name) . '.' . $ext;
+
+                // Upload destination: public/profile_photos
                 $targetDir = public_path('profile_photos');
 
                 if (!file_exists($targetDir)) {
                     mkdir($targetDir, 0755, true);
                 }
 
-                // Move the file
+                // Move the new uploaded file
                 $request->file('photo')->move($targetDir, $filename);
 
-                // Store the relative path as profile_photos/<filename> in the database
+                // Save the photo path as profile_photos/<filename> in the database
                 $user->photo = 'profile_photos/' . $filename;
             }
 
