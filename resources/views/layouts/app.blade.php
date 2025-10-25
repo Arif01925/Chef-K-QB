@@ -77,7 +77,7 @@
                         $thumb = $displayPhoto;
                     }
                 @endphp
-                <img src="{{ $thumb }}" 
+                <img src="{{ asset('public/'.$displayUser->photo) }}"
                 alt="Profile Photo" width="40" height="40" class="rounded-circle me-2">
                 <div class="d-flex flex-column align-items-start">
                     <span class="fw-bold" style="font-size: 1.1rem;">{{ $displayName }}</span>
