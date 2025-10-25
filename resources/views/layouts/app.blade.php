@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <head>
-    <title>Chef K QuickBooks</title>
-    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    <title>{{ \App\Models\Setting::get('app.name', config('app.name')) }}</title>
+    <link rel="icon" href="{{ \App\Models\Setting::get('app.favicon_path', asset('favicon.ico')) }}">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -34,9 +34,42 @@
             background-color: #e9ecef;
             font-weight: bold;
         }
+
+        body.dark-mode {
+        background-color: #121212;
+        color: #ffffff;
+    }
+
+    body.dark-mode .sidebar {
+        background-color: #1e1e1e;
+        border-color: #333;
+    }
+
+    body.dark-mode .sidebar a {
+        color: #ccc;
+    }
+
+    body.dark-mode .sidebar a:hover, body.dark-mode .sidebar .active {
+        background-color: #333;
+        color: #fff;
+    }
+
+    body.dark-mode .dropdown-menu {
+        background-color: #1e1e1e;
+        color: #ccc;
+    }
+
+    body.dark-mode .dropdown-menu a {
+        color: #ccc;
+    }
+
+    body.dark-mode .dropdown-menu a:hover {
+        background-color: #333;
+        color: #fff;
+    }
     </style>
 </head>
-<body class="bg-gray-100 font-sans">
+<body class="bg-gray-100 font-sans @if(Auth::check() && Auth::user()->dark_mode) dark-mode @endif">
 
     <!-- Header with Profile Dropdown -->
     <div class="d-flex justify-content-between align-items-center px-4" style="height:60px; background:#fff; border-bottom:1px solid #dee2e6;">
@@ -63,7 +96,7 @@
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                 <li><a class="dropdown-item" href="{{ route('profile.show') }}">Profile</a></li>
                 <li><a class="dropdown-item" href="#">Inbox</a></li>
-                <li><a class="dropdown-item" href="#">Settings</a></li>
+                <li><a class="dropdown-item" href="{{ route('settings') }}">Settings</a></li>
                 <li><a class="dropdown-item" href="#">Support</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="{{ route('logout') }}">Log Out</a></li>
@@ -140,5 +173,49 @@
         </div>
     </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const body = document.body;
+
+        // Check localStorage for dark mode preference
+        if (localStorage.getItem('dark-mode') === 'enabled') {
+            body.classList.add('dark-mode');
+        }
+
+        darkModeToggle.addEventListener('click', function () {
+            body.classList.toggle('dark-mode');
+
+            // Save preference to localStorage
+            if (body.classList.contains('dark-mode')) {
+                localStorage.setItem('dark-mode', 'enabled');
+            } else {
+                localStorage.removeItem('dark-mode');
+            }
+        });
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const togglePasswordVisibility = (toggleButton, inputField) => {
+            toggleButton.addEventListener('click', function () {
+                const type = inputField.getAttribute('type') === 'password' ? 'text' : 'password';
+                inputField.setAttribute('type', type);
+                this.textContent = type === 'password' ? 'Show' : 'Hide';
+            });
+        };
+
+        const passwordFields = document.querySelectorAll('input[type="password"]');
+        passwordFields.forEach(field => {
+            const toggleButton = document.createElement('button');
+            toggleButton.type = 'button';
+            toggleButton.textContent = 'Show';
+            toggleButton.classList.add('btn', 'btn-outline-secondary', 'btn-sm', 'ms-2');
+            field.parentNode.appendChild(toggleButton);
+            togglePasswordVisibility(toggleButton, field);
+        });
+    });
+</script>
 </body>
 </html>

@@ -1,4 +1,3 @@
-
 <?php
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Response;
@@ -157,4 +156,17 @@ Route::get('/_profile_debug', function () {
         ],
     ]);
 })->middleware('auth');
+
+Route::get('/settings', [App\Http\Controllers\SettingsController::class, 'index'])->name('settings');
+Route::get('/settings/profile', [App\Http\Controllers\SettingsController::class, 'editProfile'])->name('settings.profile');
+Route::post('/settings/profile', [App\Http\Controllers\SettingsController::class, 'updateProfile'])->name('settings.profile.update');
+Route::get('/settings/password', [App\Http\Controllers\SettingsController::class, 'editPassword'])->name('settings.password');
+Route::post('/settings/password', [App\Http\Controllers\SettingsController::class, 'updatePassword'])->name('settings.password.update');
+Route::post('/settings/toggle-theme', [App\Http\Controllers\SettingsController::class, 'toggleTheme'])->name('settings.toggleTheme');
+Route::post('/settings/toggle-notifications', [App\Http\Controllers\SettingsController::class, 'toggleNotifications'])->name('settings.toggleNotifications');
+
+// Settings Routes
+Route::post('/settings/app', [App\Http\Controllers\SettingsController::class, 'updateApp'])->name('settings.app');
+Route::post('/settings/company', [App\Http\Controllers\SettingsController::class, 'updateCompany'])->name('settings.company');
+Route::post('/settings/integrations', [App\Http\Controllers\SettingsController::class, 'updateIntegrations'])->name('settings.integrations');
 
