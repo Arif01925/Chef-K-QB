@@ -30,20 +30,24 @@ class ProfileController extends Controller
 
         // Handle photo upload if a photo is provided
         if ($request->hasFile('photo')) {
-            // Create the public/profile_photos directory if it doesn't exist
-            $publicDir = public_path('profile_photos');
-            if (!file_exists($publicDir)) {
-                mkdir($publicDir, 0755, true);
+            // Build a safe filename: name + timestamp + original extension
+            $ext = $request->file('photo')->getClientOriginalExtension();
+            $safeBase = preg_replace('/[^A-Za-z0-9\-_]/', '_', ($request->name ?: 'user'));
+            $filename = $safeBase . '_' . time() . '.' . $ext;
+
+            // Decide target dir: local → public/, live (non-local) → project root
+            $targetDir = app()->environment('local')
+                ? public_path('profile_photos')
+                : base_path('profile_photos');
+
+            if (!file_exists($targetDir)) {
+                mkdir($targetDir, 0755, true);
             }
 
-            // Generate a unique filename: replace special characters in user's name with underscores,
-            // append current timestamp, and add the original file extension
-            $filename = preg_replace('/[^A-Za-z0-9_.-]/', '_', $request->name) . '_' . time() . '.' . $request->file('photo')->getClientOriginalExtension();
+            // Move the file
+            $request->file('photo')->move($targetDir, $filename);
 
-            // Move the uploaded file to the public/profile_photos directory
-            $request->file('photo')->move($publicDir, $filename);
-
-            // Save the photo path as 'profile_photos/<filename>' (without 'public/' prefix)
+            // Save path relative to the web root (works in both setups)
             $user->photo = 'profile_photos/' . $filename;
         }
 
