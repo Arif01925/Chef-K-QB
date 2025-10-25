@@ -21,11 +21,11 @@
                 $displayUser = $user ?? Auth::user();
             @endphp
             @if(optional($displayUser)->photo)
-                <img src="{{ asset($displayUser->photo) }}" 
+                <img src="{{ asset('public/'.$displayUser->photo) }}"
              alt="Profile Photo" width="80" class="rounded mb-2">
             @else
-            <img src="{{ asset('default.png') }}" 
-            alt="Default Profile" width="80" class="rounded mb-2">
+                <img src="{{ asset('public/default.png') }}"
+                     alt="Default Profile" width="80" class="rounded mb-2">
             @endif
 
             <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
