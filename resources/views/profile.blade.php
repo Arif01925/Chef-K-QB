@@ -61,9 +61,18 @@
         </div>
         <div class="mb-3">
             <label for="photo" class="form-label">Profile Photo</label><br>
-            @php $path = optional($user)->photo; @endphp
-            <img src="{{ $path ? asset(ltrim($path, '/')) : asset('images/default-avatar.png') }}"
-                 alt="Profile Photo" width="80" class="rounded mb-2" style="object-fit:cover;">
+           @php
+                $path = optional($user)->photo;  // stored as "profile_photos/<filename>"
+                $src = $path 
+                    ? asset(ltrim($path, '/')) 
+                    : 'https://ui-avatars.com/api/?name=' . urlencode(optional($user)->name ?? 'User');
+            @endphp
+
+            <img src="{{ $src }}" 
+                alt="Profile Photo" 
+                width="80" 
+                class="rounded mb-2" 
+                style="object-fit:cover;">
             <input type="file" class="form-control" id="photo" name="photo" accept="image/*">
         </div>
         <button type="submit" class="btn btn-primary">Update Profile</button>

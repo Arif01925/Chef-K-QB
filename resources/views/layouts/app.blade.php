@@ -45,19 +45,21 @@
         </div>
         <div class="dropdown">
             @php
-                $currentUser  = Auth::user();
-                $displayName  = trim($currentUser->name ?? 'User');
-                $photoPath    = $currentUser && $currentUser->photo ? ltrim($currentUser->photo, '/') : null;
-                $thumb        = $photoPath ? asset($photoPath)
-                                           : 'https://ui-avatars.com/api/?name=' . urlencode($displayName);
-            @endphp
-            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                <img src="{{ $thumb }}" alt="Profile Photo" width="40" height="40" class="rounded-circle me-2">
-                <div class="d-flex flex-column align-items-start">
-                    <span class="fw-bold" style="font-size: 1.1rem;">{{ $displayName }}</span>
-                    <span class="text-muted" style="font-size: 0.95rem; margin-top:-2px;">{{ optional($currentUser)->role ?? '' }}</span>
-                </div>
-            </a>
+            $u = Auth::user();
+            $photoPath = $u?->photo; // stored as profile_photos/<filename>
+            $thumb = $photoPath
+                ? asset(ltrim($photoPath, '/'))  // works on both localhost & live
+                : 'https://ui-avatars.com/api/?name=' . urlencode($u->name ?? 'User');
+        @endphp
+
+        <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="profileDropdown"
+        data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="{{ $thumb }}" alt="Profile Photo" width="40" height="40" class="rounded-circle me-2">
+            <div class="d-flex flex-column align-items-start">
+                <span class="fw-bold" style="font-size: 1rem;">{{ $u->name ?? 'User' }}</span>
+                <span class="text-muted" style="font-size: 0.95rem; margin-top:-2px;">{{ $u->role ?? '' }}</span>
+            </div>
+        </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
                 <li><a class="dropdown-item" href="{{ route('profile.show') }}">Profile</a></li>
                 <li><a class="dropdown-item" href="#">Inbox</a></li>
