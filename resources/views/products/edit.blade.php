@@ -24,11 +24,13 @@
 
         <div class="mb-3">
             <label>Current Photo</label><br>
-            @if($product->photo)
-                <img src="{{ asset($product->photo) }}" width="80">
-            @else
-                <p>No photo</p>
-            @endif
+            @php
+                $path = $product->photo;
+                // normalize: remove any leading "public/" and leading slash
+                $normalized = $path ? ltrim(preg_replace('#^public/#','', $path), '/') : null;
+                $src = $normalized ? asset($normalized) : asset('images/default-product.png');
+            @endphp
+            <img src="{{ $src }}" alt="Product Image" width="80" height="80" style="object-fit:cover;border-radius:6px;">
         </div>
 
         <div class="mb-3">

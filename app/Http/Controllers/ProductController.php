@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use App\Models\Product;
 
 class ProductController extends Controller
@@ -32,10 +33,13 @@ class ProductController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('photo')) {
-            $file = $request->file('photo');
-           $filename = $file->getClientOriginalName();
-            $file->move(public_path('uploads/products'), $filename);
-            $data['photo'] = 'uploads/products/' . $filename;
+            $dir = public_path('images/products');
+            if (!is_dir($dir)) { mkdir($dir, 0755, true); }
+            $ext = $request->file('photo')->getClientOriginalExtension();
+            $base = Str::slug($request->input('name', 'product'));
+            $filename = $base . '.' . $ext;
+            $request->file('photo')->move($dir, $filename);
+            $data['photo'] = 'images/products/' . $filename;
         }
 
         Product::create($data);
@@ -63,10 +67,17 @@ class ProductController extends Controller
         $data = $request->all();
 
         if ($request->hasFile('photo')) {
-            $file = $request->file('photo');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('uploads/products'), $filename);
-            $data['photo'] = 'uploads/products/' . $filename;
+            $dir = public_path('images/products');
+            if (!is_dir($dir)) { mkdir($dir, 0755, true); }
+            $ext = $request->file('photo')->getClientOriginalExtension();
+            $base = Str::slug($request->input('name', 'product'));
+            $filename = $base . '.' . $ext;
+            // delete old file if present
+            if (!empty($product->photo) && file_exists(public_path(ltrim(preg_replace('#^public/#','',$product->photo), '/')))) {
+                @unlink(public_path(ltrim(preg_replace('#^public/#','',$product->photo), '/')));
+            }
+            $request->file('photo')->move($dir, $filename);
+            $data['photo'] = 'images/products/' . $filename;
         }
 
         $product->update($data);

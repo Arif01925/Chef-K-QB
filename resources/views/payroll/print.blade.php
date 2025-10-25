@@ -52,8 +52,7 @@
 <body onload="window.print()">
 
     <div class="logo">
-        <img src="https://mcusercontent.com/f2f8f3acd26a96e38ec184680/images/44148a42-15e2-b62d-a079-1618e103e035.png" alt="Chef K Logo" style="height: 100px;">
-
+        <img src="{{ asset('logo.png') }}" alt="Chef K Logo" style="height:100px;">
     </div>
 
     <h2>Payroll Summary Report</h2>

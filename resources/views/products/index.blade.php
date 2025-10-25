@@ -24,11 +24,13 @@
                     <td>{{ $product->name }}</td>
                     <td>{{ $product->sku }}</td>
                     <td>
-                        @if($product->photo)
-                            <img src="{{ asset('uploads/products/' . $product->photo) }}" width="60" alt="Product Image">
-                        @else
-                            <span class="text-muted">No image</span>
-                        @endif
+                        @php
+                            $path = $product->photo;
+                            // normalize: remove any leading "public/" and leading slash
+                            $normalized = $path ? ltrim(preg_replace('#^public/#','', $path), '/') : null;
+                            $src = $normalized ? asset($normalized) : asset('images/default-product.png');
+                        @endphp
+                        <img src="{{ $src }}" alt="Product Image" width="60" height="60" style="object-fit:cover;border-radius:6px;">
                     </td>
                     <td>${{ number_format($product->price, 2) }}</td>
                     <td>{{ $product->unit }}</td>
