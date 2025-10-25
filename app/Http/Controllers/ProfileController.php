@@ -24,35 +24,40 @@ class ProfileController extends Controller
             'photo' => 'nullable|image|max:2048',
         ]);
 
-        // Update the user's name and email
-        $user->name = $request->name;
-        $user->email = $request->email;
+        try {
+            // Update the user's name and email
+            $user->name = $request->name;
+            $user->email = $request->email;
 
-        // Handle photo upload if a photo is provided
-        if ($request->hasFile('photo')) {
-            // Build a safe filename: name + timestamp + original extension
-            $ext = $request->file('photo')->getClientOriginalExtension();
-            $safeBase = preg_replace('/[^A-Za-z0-9\-_]/', '_', ($request->name ?: 'user'));
-            $filename = $safeBase . '_' . time() . '.' . $ext;
+            // Handle photo upload if a photo is provided
+            if ($request->hasFile('photo')) {
+                // Build a safe filename: name + timestamp + original extension
+                $ext = $request->file('photo')->getClientOriginalExtension();
+                $safeBase = preg_replace('/[^A-Za-z0-9\-_]/', '_', ($request->name ?: 'user'));
+                $filename = $safeBase . '_' . time() . '.' . $ext;
 
-            // Upload destination: always public/profile_photos
-            $targetDir = public_path('profile_photos');
+                // Upload destination: always public/profile_photos
+                $targetDir = public_path('profile_photos');
 
-            if (!file_exists($targetDir)) {
-                mkdir($targetDir, 0755, true);
+                if (!file_exists($targetDir)) {
+                    mkdir($targetDir, 0755, true);
+                }
+
+                // Move the file
+                $request->file('photo')->move($targetDir, $filename);
+
+                // Store the relative path as profile_photos/<filename> in the database
+                $user->photo = 'profile_photos/' . $filename;
             }
 
-            // Move the file
-            $request->file('photo')->move($targetDir, $filename);
+            // Save the updated user data
+            $user->save();
 
-            // Store the relative path as profile_photos/<filename> in the database
-            $user->photo = 'profile_photos/' . $filename;
+            // Redirect back with a success message
+            return back()->with('success', 'Profile updated successfully!');
+        } catch (\Exception $e) {
+            // Redirect back with an error message
+            return back()->with('error', 'Failed to update profile. Please try again.');
         }
-
-        // Save the updated user data
-        $user->save();
-
-        // Redirect back with a success message
-        return back()->with('success', 'Profile updated successfully!');
     }
 }
